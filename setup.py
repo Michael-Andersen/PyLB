@@ -1,8 +1,8 @@
 import setuptools
 
 setuptools.setup(
-    name="PyLB",
-    version="0.0.5",
+    name="PyLetterB",
+    version="0.0.1",
     author="Michael Andersen",
     author_email="mjpandersen@gmail.com",
     description="An unoffical letterboxd API for user likes",

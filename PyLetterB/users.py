@@ -1,4 +1,4 @@
-from PyLB.getpage import get_page
+from PyLetterB.getpage import get_page
 import random
 import logging
 
