@@ -1,5 +1,9 @@
 from PyLB.getpage import get_page
 import random
+import logging
+
+logger = logging.getLogger()
+
 
 def get_users_by_film_per_page(film, page, order=''):
     random_orders = ['/', '/by/date-earliest/', '/by/member-rating/']
@@ -9,6 +13,7 @@ def get_users_by_film_per_page(film, page, order=''):
         order = random_orders[random.randrange(0, len(random_orders))]
     else:
         order = possible_orders[order]
+    logger.info(f'Getting user likes for film: {film} order: {order}, page: {page}')
     url = f'https://letterboxd.com/film/{film}/likes{order}page/{page}'
     soup = get_page(url)
     text = soup.find_all(class_='name')
@@ -20,43 +25,20 @@ def get_users_by_film_per_page(film, page, order=''):
         users.append(raw[0].split("/")[1])
     return users
 
-def get_users_by_film_all(film, page, order=''):
+
+def get_users_by_film_all(film, order='newest'):
     users = []
     userset = get_users_by_film_per_page(film, 1, order)
     i = 2
     while userset:
         users.extend(userset)
-        userset = get_user_likes_per_page(film, i, order)
+        userset = get_users_by_film_per_page(film, i, order)
         i += 1
     return users
 
-def get_users_by_film(film, page=None, order=''):
-    text = []
-    first_time = True
-    if not page:
-        page = random.randint(0, 20)
-        while len(text) < 25 and page != 1:
-            if not first_time:
-                page = page // 2
-            text = get_users_by_film_per_page(film, page, order)
-            first_time = False
-    elif page == 'all':
-        text = []
-        textset = get_users_by_film_per_page(film, 1, order)
-        i = 2
-        while textset:
-            text.extend(textset)
-            textset = get_user_likes_per_page(film, i, order)
-            i += 1
-    user_links = []
-    for i in text:
-        raw = str(i)
-        raw = raw.replace('<a class="name" href="', '')
-        raw = raw.split('"')
-        user_links.append(raw[0].split("/")[1])
-    return user_links
 
-def get_user_likes_per_page(user, page, order=''):
+def get_user_likes_per_page(user, page):
+    logger.info(f'Getting likes for user: {user}, page: {page}')
     url = f'https://letterboxd.com/{user}/likes/films/page/{page}'
     soup = get_page(url)
     text = soup.find_all(class_='poster')
